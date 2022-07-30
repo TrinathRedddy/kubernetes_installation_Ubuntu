@@ -1,0 +1,79 @@
+Kubernetes Installtion On ubuntu 20.04
+
+Youtube video :-  https://www.youtube.com/watch?v=Tg1IFwtVCVo
+Steps Doing In Master
+
+
+    2  swapoff -a
+    3  sudo reboot
+    4  clear
+    5  sudo apt-get update -y
+    6  sudo apt-get install -y docker.io
+    7  docker --version
+    8  sudo systemctl status docker.service
+    9  clear
+   10  sudo systemctl enable docker.service
+   11  sudo apt-get install -y apt-transport-https
+   12  sudo apt-get install -y curl
+   13  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+   14  sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+   15  sudo apt-get install -y kubelet kubeadm kubectl
+   16  clear
+   17  sudo apt-mark hold kubelet kubeadm kubectl
+   18  sed -i "s/cgroup-driver=systemd/cgroup-driver=cgroupfs/g /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+   19  sudo CG=$(sudo docker info 2>/dev/null | sed -n 's/Cgroup Driver: \(.*\)/\1/p')
+   20  sed -i "s/cgroup-driver=systemd/cgroup-driver=$CG/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+   21  CG=$(sudo docker info 2>/dev/null | sed -n 's/Cgroup Driver: \(.*\)/\1/p')
+   22  sudo sed -i "s/cgroup-driver=systemd/cgroup-driver=$CG/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+   23  clear
+   24  sudo systemctl daemon-reload
+   25  sudo systemctl restart kube
+   26  sudo systemctl restart kubelet
+   27  sudo kubeadm init   --pod-network-cidr=10.2.1.87/16
+   28  mkdir -p $HOME/.kube
+   29  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+   30  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+   31  kubeadm version
+   32  kubectl get nodes
+   33  kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+   34  kubectl get nodes
+   35  kubectl label node ip-10-2-1-230 node-role.kubernetes.io/worker=worker
+   36  kubectl get nodes
+   37  sudo nano nginx-deploy.yml
+   38  kubectl apply -f nginx-deploy.yml
+   39  kubectl get pods
+   40  sudo kubectl get nodes
+   41  kubectl get nodes
+   42  kubectl get pods --all-namespaces
+   43  ip a s
+
+Steps Doing In Slave
+
+
+3  swapoff -a
+    4  sudo reboot
+    5  clear
+    6  sudo apt-get update -y
+    7  sudo apt-get install -y docker.io
+    8  sudo systemctl status docker.service
+    9  sudo systemctl enable docker.service
+   10  clear
+   11  sudo apt-get install -y apt-transport-https
+   12  sudo apt-get install -y curl
+   13  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+   14  sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+   15  sudo apt-get install -y kubelet kubeadm kubectl
+   16  sudo apt-mark hold kubelet kubeadm kubectl
+   17  clear
+   18  sed -i "s/cgroup-driver=systemd/cgroup-driver=cgroupfs/g /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+   19  CG=$(sudo docker info 2>/dev/null | sed -n 's/Cgroup Driver: \(.*\)/\1/p')
+   20  sed -i "s/cgroup-driver=systemd/cgroup-driver=$CG/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+   21  sudo sed -i "s/cgroup-driver=systemd/cgroup-driver=$CG/g" /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+   22  clear
+   23  sudo systemctl daemon-reload
+   24  sudo systemctl restart kubelet
+   25  kubeadm join 10.2.1.87:6443 --token pvlzfw.8i5hbrbsxuttk3pa         --discovery-token-ca-cert-hash sha256:29fba868e4f459c5d310bcfd38988487b453e6bb92c8469fc4cd25da753b82ba
+   26  sudo kubeadm join 10.2.1.87:6443 --token pvlzfw.8i5hbrbsxuttk3pa         --discovery-token-ca-cert-hash sha256:29fba868e4f459c5d310bcfd38988487b453e6bb92c8469fc4cd25da753b82ba
+   27  history
